@@ -1,0 +1,5 @@
+{
+  "name": "CS2 Case Simulator",
+  "description": "A Counter-Strike 2 case opening simulator with roulette animation, inventory, and realistic odds.",
+  "requestFramePermissions": []
+}
