@@ -15,47 +15,30 @@ export function Roulette({ items, winningItem, onComplete, soundEnabled = true }
   const controls = useAnimation();
   const [isSpinning, setIsSpinning] = useState(true);
   
-  // Audio context ref
-  const audioCtxRef = useRef<AudioContext | null>(null);
+  // Audio pool for tick sounds to allow overlapping
+  const audioPoolRef = useRef<HTMLAudioElement[]>([]);
+  const nextAudioIndexRef = useRef(0);
   const lastIndexRef = useRef<number>(-1);
-  
-  // Initialize audio context on mount
+
   useEffect(() => {
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (AudioContextClass) {
-      audioCtxRef.current = new AudioContextClass();
+    // Pre-create a pool of 5 audio elements for the tick sound
+    const pool: HTMLAudioElement[] = [];
+    for (let i = 0; i < 5; i++) {
+      const audio = new Audio('https://raw.githubusercontent.com/Vozn1akHero/CSGOCaseOpeningSimulator/master/public/sound/roll.mp3');
+      audio.preload = 'auto';
+      pool.push(audio);
     }
-    return () => {
-      if (audioCtxRef.current?.state !== 'closed') {
-        audioCtxRef.current?.close().catch(() => {});
-      }
-    };
+    audioPoolRef.current = pool;
   }, []);
 
   const playTick = () => {
-    if (!soundEnabled || !audioCtxRef.current) return;
+    if (!soundEnabled || audioPoolRef.current.length === 0) return;
     
-    const ctx = audioCtxRef.current;
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-    }
+    const audio = audioPoolRef.current[nextAudioIndexRef.current];
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
     
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    // A short, percussive "click" sound
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05);
-    
-    gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-    
-    osc.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    osc.start();
-    osc.stop(ctx.currentTime + 0.05);
+    nextAudioIndexRef.current = (nextAudioIndexRef.current + 1) % audioPoolRef.current.length;
   };
 
   // Use a ref for onComplete to avoid re-triggering the effect when it changes

@@ -87,6 +87,19 @@ export default function App() {
     const saved = localStorage.getItem('cs2_sim_settings');
     return saved ? JSON.parse(saved) : { instaOpen: false, soundEnabled: true };
   });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Device detection and aspect ratio handling
+  useEffect(() => {
+    const checkDevice = () => {
+      const mobile = window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent);
+      setIsMobile(mobile);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
 
   // Save state to local storage when it changes
   useEffect(() => {
@@ -193,280 +206,317 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f1115] text-gray-200 font-sans selection:bg-[#4b69ff] selection:text-white flex flex-col">
-      {/* Header */}
-      <header className="bg-[#1a1c23] border-b border-[#2a2d36] sticky top-0 z-40 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-white tracking-wider uppercase flex items-center gap-2">
-              <span className="text-[#4b69ff]">CS2</span> Simulator
-            </h1>
-            
-            <nav className="hidden md:flex ml-8 space-x-1">
-              <button 
-                onClick={() => setView('selector')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  view === 'selector' || view === 'opening' 
-                    ? 'bg-[#2a2d36] text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-[#2a2d36]/50'
-                }`}
-              >
-                Cases
-              </button>
-              <button 
-                onClick={() => setView('inventory')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                  view === 'inventory' 
-                    ? 'bg-[#2a2d36] text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-[#2a2d36]/50'
-                }`}
-              >
-                <Package size={16} />
-                Inventory ({inventory.length})
-              </button>
-              <button 
-                onClick={() => setView('settings')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                  view === 'settings' 
-                    ? 'bg-[#2a2d36] text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-[#2a2d36]/50'
-                }`}
-              >
-                <SettingsIcon size={16} />
-                Settings
-              </button>
-            </nav>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-[#2a2d36] px-4 py-2 rounded-md border border-[#3a3d46]">
-              <Wallet size={16} className="text-green-400" />
-              <span className="font-mono font-bold text-white">${balance.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={addFunds}
-                className="bg-[#2a2d36] hover:bg-[#3a3d46] text-white p-2 rounded-md transition-colors border border-[#3a3d46] flex items-center justify-center"
-                title="Add $0.05"
-              >
-                <DollarSign size={16} />
-              </button>
-              <button 
-                onClick={resetGame}
-                className="bg-red-500/20 hover:bg-red-500/40 text-red-400 p-2 rounded-md transition-colors border border-red-500/30 flex items-center justify-center text-sm font-bold px-3"
-                title="Reset Game"
-              >
-                RESET
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-grow relative overflow-x-hidden">
-        {view === 'selector' && (
-          <CaseSelector 
-            balance={balance} 
-            ownedCases={ownedCases}
-            ownedKeys={ownedKeys}
-            onBuyCase={handleBuyCase}
-            onBuyKey={handleBuyKey}
-            onOpenCase={handleOpenCase}
-          />
-        )}
-        
-        {view === 'inventory' && (
-          <Inventory items={inventory} onSellItem={handleSellItem} />
-        )}
-
-        {view === 'settings' && (
-          <div className="max-w-4xl mx-auto px-4 py-12">
-            <h2 className="text-3xl font-bold text-white mb-8">Settings</h2>
-            
-            <div className="bg-[#1a1c23] border border-[#2a2d36] rounded-xl overflow-hidden shadow-xl">
-              <div className="p-6 border-b border-[#2a2d36]">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Insta Open Case</h3>
-                    <p className="text-sm text-gray-400 mt-1">Skip the roulette animation and instantly see your item.</p>
-                  </div>
-                  <button
-                    onClick={() => setSettings(prev => ({ ...prev, instaOpen: !prev.instaOpen }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                      settings.instaOpen ? 'bg-[#4b69ff]' : 'bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        settings.instaOpen ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
+    <div className="min-h-screen bg-[#050505] flex items-center justify-center overflow-hidden p-0 sm:p-4">
+      <div 
+        className="bg-[#0f1115] text-gray-200 font-sans selection:bg-[#4b69ff] selection:text-white flex flex-col relative shadow-2xl overflow-hidden w-full h-full"
+        style={{
+          aspectRatio: isMobile ? '9/16' : '1920/1080',
+          maxHeight: '100vh',
+          maxWidth: isMobile ? 'calc(100vh * 9 / 16)' : 'calc(100vh * 1920 / 1080)',
+          margin: 'auto'
+        }}
+      >
+        {/* Header */}
+        <header className="bg-[#1a1c23] border-b border-[#2a2d36] sticky top-0 z-40 shadow-md flex-shrink-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h1 className="text-lg sm:text-xl font-bold text-white tracking-wider uppercase flex items-center gap-2">
+                <span className="text-[#4b69ff]">CS2</span> {isMobile ? '' : 'Simulator'}
+              </h1>
               
-              <div className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Sound Effects</h3>
-                    <p className="text-sm text-gray-400 mt-1">Enable or disable sound effects during case opening.</p>
-                  </div>
-                  <button
-                    onClick={() => setSettings(prev => ({ ...prev, soundEnabled: !prev.soundEnabled }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                      settings.soundEnabled ? 'bg-[#4b69ff]' : 'bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        settings.soundEnabled ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {view === 'opening' && selectedCase && winningItem && (
-          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] pt-12 pb-24">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold text-white uppercase tracking-wider mb-2">Opening {selectedCase.name}</h2>
-              <p className="text-gray-400">Good luck!</p>
-            </div>
-            
-            <div className="w-full max-w-7xl mx-auto relative">
-              {openingState === 'unlocking' && !settings.instaOpen ? (
-                <CaseUnlockAnimation 
-                  caseImage={selectedCase.image} 
-                  onComplete={handleUnlockComplete} 
-                  soundEnabled={settings.soundEnabled}
-                />
-              ) : (
-                <Roulette 
-                  items={rouletteItems} 
-                  winningItem={winningItem} 
-                  onComplete={handleRouletteComplete} 
-                  soundEnabled={settings.soundEnabled}
-                />
-              )}
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Result Modal */}
-      <AnimatePresence>
-        {showResultModal && winningItem && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-          >
-            <motion.div 
-              {...getModalAnimation(winningItem.item.rarity)}
-              style={getGlowStyle(winningItem.item.rarity)}
-              className="bg-[#1a1c23] border-2 rounded-xl max-w-md w-full overflow-hidden flex flex-col relative"
-            >
-              <div className="p-6 text-center border-b border-[#2a2d36] bg-[#12141a]/50">
-                <h3 className="text-xl font-bold uppercase tracking-wider" style={{ color: RARITY_COLORS[winningItem.item.rarity] || 'white' }}>
-                  {getHeaderText(winningItem.item.rarity)}
-                </h3>
-              </div>
-              
-              <div className="p-8 flex justify-center bg-gradient-to-b from-[#1a1c23] to-[#0f1115] relative overflow-hidden">
-                {(winningItem.item.rarity === 'Covert' || winningItem.item.rarity === 'Rare Special Item') && (
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-[-50%] opacity-20"
-                    style={{ background: `radial-gradient(circle, ${RARITY_COLORS[winningItem.item.rarity]} 0%, transparent 60%)` }}
-                  />
-                )}
-                <ItemCard 
-                  item={winningItem.item} 
-                  inventoryItem={winningItem} 
-                  className="w-64 transform scale-110 relative z-10" 
-                />
-              </div>
-              
-              <div className="p-6 flex gap-4 bg-[#1a1c23] border-t border-[#2a2d36] relative z-10">
+              <nav className="hidden md:flex ml-8 space-x-1">
                 <button 
-                  onClick={handleCloseResult}
-                  className="flex-1 bg-[#2a2d36] hover:bg-[#3a3d46] text-white font-bold py-3 px-4 rounded-md transition-colors uppercase tracking-wider text-sm flex items-center justify-center gap-2"
-                >
-                  <ArrowLeft size={16} />
-                  Back to Cases
-                </button>
-                <button 
-                  onClick={() => {
-                    if (selectedCase && (ownedCases[selectedCase.id] || 0) > 0 && (ownedKeys[selectedCase.id] || 0) > 0) {
-                      handleOpenCase(selectedCase);
-                    } else {
-                      handleCloseResult();
-                    }
-                  }}
-                  disabled={!selectedCase || (ownedCases[selectedCase.id] || 0) < 1 || (ownedKeys[selectedCase.id] || 0) < 1}
-                  className={`flex-1 font-bold py-3 px-4 rounded-md transition-colors uppercase tracking-wider text-sm ${
-                    selectedCase && (ownedCases[selectedCase.id] || 0) > 0 && (ownedKeys[selectedCase.id] || 0) > 0
-                      ? 'bg-[#4b69ff] hover:bg-[#3b59df] text-white'
-                      : 'bg-[#2a2d36] text-gray-500 cursor-not-allowed'
+                  onClick={() => setView('selector')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    view === 'selector' || view === 'opening' 
+                      ? 'bg-[#2a2d36] text-white' 
+                      : 'text-gray-400 hover:text-white hover:bg-[#2a2d36]/50'
                   }`}
                 >
-                  Open Another
+                  Cases
+                </button>
+                <button 
+                  onClick={() => setView('inventory')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                    view === 'inventory' 
+                      ? 'bg-[#2a2d36] text-white' 
+                      : 'text-gray-400 hover:text-white hover:bg-[#2a2d36]/50'
+                  }`}
+                >
+                  <Package size={16} />
+                  Inventory ({inventory.length})
+                </button>
+                <button 
+                  onClick={() => setView('settings')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                    view === 'settings' 
+                      ? 'bg-[#2a2d36] text-white' 
+                      : 'text-gray-400 hover:text-white hover:bg-[#2a2d36]/50'
+                  }`}
+                >
+                  <SettingsIcon size={16} />
+                  Settings
+                </button>
+              </nav>
+            </div>
+            
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-2 bg-[#2a2d36] px-3 sm:px-4 py-2 rounded-md border border-[#3a3d46]">
+                <Wallet size={14} className="text-green-400" />
+                <span className="font-mono font-bold text-white text-sm sm:text-base">${balance.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <button 
+                  onClick={addFunds}
+                  className="bg-[#2a2d36] hover:bg-[#3a3d46] text-white p-2 rounded-md transition-colors border border-[#3a3d46] flex items-center justify-center"
+                  title="Add $0.05"
+                >
+                  <DollarSign size={14} />
+                </button>
+                <button 
+                  onClick={resetGame}
+                  className="bg-red-500/20 hover:bg-red-500/40 text-red-400 p-2 rounded-md transition-colors border border-red-500/30 flex items-center justify-center text-xs font-bold px-2 sm:px-3"
+                  title="Reset Game"
+                >
+                  RESET
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+        </header>
 
-      {/* Reset Confirmation Modal */}
-      <AnimatePresence>
-        {resetStep > 0 && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        {/* Mobile Nav - visible only on mobile */}
+        <nav className="md:hidden bg-[#1a1c23] border-b border-[#2a2d36] flex justify-around p-2 flex-shrink-0">
+          <button 
+            onClick={() => setView('selector')}
+            className={`p-2 rounded-md transition-colors ${view === 'selector' || view === 'opening' ? 'text-[#4b69ff]' : 'text-gray-400'}`}
           >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#1a1c23] border border-[#2a2d36] rounded-xl shadow-2xl max-w-md w-full overflow-hidden"
-            >
-              <div className="p-6 text-center">
-                <h2 className="text-xl font-bold text-white mb-4">
-                  {resetStep === 1 ? "Reset Game" : "Final Warning"}
-                </h2>
-                <p className="text-gray-300 mb-8">
-                  {resetStep === 1 
-                    ? "Do you really want to reset all your stuff?" 
-                    : "Are you sure you will lose all your items and money?"}
-                </p>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={cancelReset}
-                    className="flex-1 bg-[#2a2d36] hover:bg-[#3a3d46] text-white font-bold py-3 px-4 rounded-md transition-colors uppercase tracking-wider text-sm"
-                  >
-                    No, Cancel
-                  </button>
-                  <button 
-                    onClick={resetStep === 1 ? confirmResetStep1 : confirmResetStep2}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-md transition-colors uppercase tracking-wider text-sm"
-                  >
-                    Yes, I'm Sure
-                  </button>
+            <Package size={20} />
+          </button>
+          <button 
+            onClick={() => setView('inventory')}
+            className={`p-2 rounded-md transition-colors ${view === 'inventory' ? 'text-[#4b69ff]' : 'text-gray-400'}`}
+          >
+            <div className="relative">
+              <Package size={20} />
+              <span className="absolute -top-1 -right-1 bg-[#4b69ff] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                {inventory.length}
+              </span>
+            </div>
+          </button>
+          <button 
+            onClick={() => setView('settings')}
+            className={`p-2 rounded-md transition-colors ${view === 'settings' ? 'text-[#4b69ff]' : 'text-gray-400'}`}
+          >
+            <SettingsIcon size={20} />
+          </button>
+        </nav>
+
+        {/* Main Content */}
+        <main className="flex-grow relative overflow-y-auto overflow-x-hidden custom-scrollbar">
+          {view === 'selector' && (
+            <CaseSelector 
+              balance={balance} 
+              ownedCases={ownedCases}
+              ownedKeys={ownedKeys}
+              onBuyCase={handleBuyCase}
+              onBuyKey={handleBuyKey}
+              onOpenCase={handleOpenCase}
+            />
+          )}
+          
+          {view === 'inventory' && (
+            <Inventory items={inventory} onSellItem={handleSellItem} />
+          )}
+
+          {view === 'settings' && (
+            <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">Settings</h2>
+              
+              <div className="bg-[#1a1c23] border border-[#2a2d36] rounded-xl overflow-hidden shadow-xl">
+                <div className="p-4 sm:p-6 border-b border-[#2a2d36]">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-bold text-white">Insta Open Case</h3>
+                      <p className="text-xs sm:text-sm text-gray-400 mt-1">Skip the roulette animation and instantly see your item.</p>
+                    </div>
+                    <button
+                      onClick={() => setSettings(prev => ({ ...prev, instaOpen: !prev.instaOpen }))}
+                      className={`relative inline-flex h-5 w-10 sm:h-6 sm:w-11 items-center rounded-full transition-colors focus:outline-none ${
+                        settings.instaOpen ? 'bg-[#4b69ff]' : 'bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white transition-transform ${
+                          settings.instaOpen ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-bold text-white">Sound Effects</h3>
+                      <p className="text-xs sm:text-sm text-gray-400 mt-1">Enable or disable sound effects during case opening.</p>
+                    </div>
+                    <button
+                      onClick={() => setSettings(prev => ({ ...prev, soundEnabled: !prev.soundEnabled }))}
+                      className={`relative inline-flex h-5 w-10 sm:h-6 sm:w-11 items-center rounded-full transition-colors focus:outline-none ${
+                        settings.soundEnabled ? 'bg-[#4b69ff]' : 'bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white transition-transform ${
+                          settings.soundEnabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
+            </div>
+          )}
+          
+          {view === 'opening' && selectedCase && winningItem && (
+            <div className="flex flex-col items-center justify-center min-h-full py-8 sm:py-12">
+              <div className="mb-6 sm:mb-8 text-center px-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-white uppercase tracking-wider mb-2">Opening {selectedCase.name}</h2>
+                <p className="text-sm sm:text-base text-gray-400">Good luck!</p>
+              </div>
+              
+              <div className="w-full relative">
+                {openingState === 'unlocking' && !settings.instaOpen ? (
+                  <CaseUnlockAnimation 
+                    caseImage={selectedCase.image} 
+                    onComplete={handleUnlockComplete} 
+                    soundEnabled={settings.soundEnabled}
+                  />
+                ) : (
+                  <Roulette 
+                    items={rouletteItems} 
+                    winningItem={winningItem} 
+                    onComplete={handleRouletteComplete} 
+                    soundEnabled={settings.soundEnabled}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+        </main>
+
+        {/* Result Modal */}
+        <AnimatePresence>
+          {showResultModal && winningItem && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            >
+              <motion.div 
+                {...getModalAnimation(winningItem.item.rarity)}
+                style={getGlowStyle(winningItem.item.rarity)}
+                className="bg-[#1a1c23] border-2 rounded-xl max-w-sm sm:max-w-md w-full overflow-hidden flex flex-col relative"
+              >
+                <div className="p-4 sm:p-6 text-center border-b border-[#2a2d36] bg-[#12141a]/50">
+                  <h3 className="text-lg sm:text-xl font-bold uppercase tracking-wider" style={{ color: RARITY_COLORS[winningItem.item.rarity] || 'white' }}>
+                    {getHeaderText(winningItem.item.rarity)}
+                  </h3>
+                </div>
+                
+                <div className="p-6 sm:p-8 flex justify-center bg-gradient-to-b from-[#1a1c23] to-[#0f1115] relative overflow-hidden">
+                  {(winningItem.item.rarity === 'Covert' || winningItem.item.rarity === 'Rare Special Item') && (
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-[-50%] opacity-20"
+                      style={{ background: `radial-gradient(circle, ${RARITY_COLORS[winningItem.item.rarity]} 0%, transparent 60%)` }}
+                    />
+                  )}
+                  <ItemCard 
+                    item={winningItem.item} 
+                    inventoryItem={winningItem} 
+                    className="w-48 sm:w-64 transform scale-100 sm:scale-110 relative z-10" 
+                  />
+                </div>
+                
+                <div className="p-4 sm:p-6 flex gap-3 sm:gap-4 bg-[#1a1c23] border-t border-[#2a2d36] relative z-10">
+                  <button 
+                    onClick={handleCloseResult}
+                    className="flex-1 bg-[#2a2d36] hover:bg-[#3a3d46] text-white font-bold py-2 sm:py-3 px-3 sm:px-4 rounded-md transition-colors uppercase tracking-wider text-[10px] sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
+                  >
+                    <ArrowLeft size={14} />
+                    Back
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (selectedCase && (ownedCases[selectedCase.id] || 0) > 0 && (ownedKeys[selectedCase.id] || 0) > 0) {
+                        handleOpenCase(selectedCase);
+                      } else {
+                        handleCloseResult();
+                      }
+                    }}
+                    disabled={!selectedCase || (ownedCases[selectedCase.id] || 0) < 1 || (ownedKeys[selectedCase.id] || 0) < 1}
+                    className={`flex-1 font-bold py-2 sm:py-3 px-3 sm:px-4 rounded-md transition-colors uppercase tracking-wider text-[10px] sm:text-sm ${
+                      selectedCase && (ownedCases[selectedCase.id] || 0) > 0 && (ownedKeys[selectedCase.id] || 0) > 0
+                        ? 'bg-[#4b69ff] hover:bg-[#3b59df] text-white'
+                        : 'bg-[#2a2d36] text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    Open Another
+                  </button>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+
+        {/* Reset Confirmation Modal */}
+        <AnimatePresence>
+          {resetStep > 0 && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            >
+              <motion.div 
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="bg-[#1a1c23] border border-[#2a2d36] rounded-xl shadow-2xl max-w-md w-full overflow-hidden"
+              >
+                <div className="p-6 text-center">
+                  <h2 className="text-xl font-bold text-white mb-4">
+                    {resetStep === 1 ? "Reset Game" : "Final Warning"}
+                  </h2>
+                  <p className="text-gray-300 mb-8">
+                    {resetStep === 1 
+                      ? "Do you really want to reset all your stuff?" 
+                      : "Are you sure you will lose all your items and money?"}
+                  </p>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={cancelReset}
+                      className="flex-1 bg-[#2a2d36] hover:bg-[#3a3d46] text-white font-bold py-3 px-4 rounded-md transition-colors uppercase tracking-wider text-sm"
+                    >
+                      No
+                    </button>
+                    <button 
+                      onClick={resetStep === 1 ? confirmResetStep1 : confirmResetStep2}
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-md transition-colors uppercase tracking-wider text-sm"
+                    >
+                      Yes
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
