@@ -8,6 +8,7 @@ import { CaseUnlockAnimation } from './components/CaseUnlockAnimation';
 import { Inventory } from './components/Inventory';
 import { ItemCard } from './components/ItemCard';
 import { Upgrades } from './components/Upgrades';
+import { TutorialModal } from './components/TutorialModal';
 import { Wallet, Package, ArrowLeft, DollarSign, Settings as SettingsIcon, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RARITY_COLORS } from './data/cases';
@@ -91,6 +92,9 @@ export default function App() {
   const [upgrades, setUpgrades] = useState<{clickLevel: number, luckLevel: number}>(() => {
     const saved = localStorage.getItem('cs2_sim_upgrades');
     return saved ? JSON.parse(saved) : { clickLevel: 0, luckLevel: 0 };
+  });
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return localStorage.getItem('cs2_sim_tutorial') !== 'true';
   });
   const [isMobile, setIsMobile] = useState(false);
 
@@ -231,8 +235,14 @@ export default function App() {
     setResetStep(0);
   };
 
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+    localStorage.setItem('cs2_sim_tutorial', 'true');
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center overflow-hidden p-0 sm:p-4">
+      {showTutorial && <TutorialModal onClose={handleCloseTutorial} />}
       <div 
         className="bg-[#0f1115] text-gray-200 font-sans selection:bg-[#4b69ff] selection:text-white flex flex-col relative shadow-2xl overflow-hidden w-full h-full"
         style={{
