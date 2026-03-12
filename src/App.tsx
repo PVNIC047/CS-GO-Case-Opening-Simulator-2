@@ -9,6 +9,7 @@ import { Inventory } from './components/Inventory';
 import { ItemCard } from './components/ItemCard';
 import { Upgrades } from './components/Upgrades';
 import { TutorialModal } from './components/TutorialModal';
+import { CheatModal } from './components/CheatModal';
 import { Wallet, Package, ArrowLeft, DollarSign, Settings as SettingsIcon, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RARITY_COLORS } from './data/cases';
@@ -96,6 +97,7 @@ export default function App() {
   const [showTutorial, setShowTutorial] = useState(() => {
     return localStorage.getItem('cs2_sim_tutorial') !== 'true';
   });
+  const [showCheatMenu, setShowCheatMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Device detection and aspect ratio handling
@@ -243,6 +245,15 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center overflow-hidden p-0 sm:p-4">
       {showTutorial && <TutorialModal onClose={handleCloseTutorial} />}
+      {showCheatMenu && (
+        <CheatModal 
+          onClose={() => setShowCheatMenu(false)} 
+          balance={balance} 
+          setBalance={setBalance} 
+          luckLevel={upgrades.luckLevel} 
+          setLuckLevel={(luckLevel) => setUpgrades(prev => ({ ...prev, luckLevel }))} 
+        />
+      )}
       <div 
         className="bg-[#0f1115] text-gray-200 font-sans selection:bg-[#4b69ff] selection:text-white flex flex-col relative shadow-2xl overflow-hidden w-full h-full"
         style={{
@@ -257,7 +268,12 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h1 className="text-lg sm:text-xl font-bold text-white tracking-wider uppercase flex items-center gap-2">
-                <span className="text-[#4b69ff]">CS2</span> {isMobile ? '' : 'Simulator'}
+                <span 
+                  className="text-[#4b69ff] cursor-default select-none" 
+                  onClick={() => setShowCheatMenu(true)}
+                >
+                  CS2
+                </span> {isMobile ? '' : 'Simulator'}
               </h1>
               
               <nav className="hidden md:flex ml-8 space-x-1">

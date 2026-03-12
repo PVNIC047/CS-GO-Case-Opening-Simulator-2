@@ -5734,7 +5734,86 @@ const crate7007Items: Item[] = [
   }
 ];
 
-export const CASES: Case[] = [
+const KNIVES = [
+  {
+    "name": "★ Karambit",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XuWbwcuyMESA4Fdl-4nnpU7iQA3-kKnr8ytd6s2labZsLfKaGinEx-0u5LhqGHrjlElz52jRmN2sd3yfb1NzWZVwRbNeu0S5k9WxMuvh-UWA3ObnwJvj"
+  },
+  {
+    "name": "★ Butterfly Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Z-ua6bbZrLOmsHXevzOtluN59TieMmBgjuiiI1Negd3-TaFUhWZciELEJtxS8kdznPr7m5ACMg40XniqsiC5I63posrocEf1ybD3MrwU"
+  },
+  {
+    "name": "★ M9 Bayonet",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Wts2sab1iLvWHMWSF_uMvj-NoVhaggRIptiqEiYfGLC7DN0N9FMMhELFYtRLpx9W0MLjh4Q2L2d9AyHiv3HhKvCc44L0CAKJxrPfXjADfcepqy0ujMBs"
+  },
+  {
+    "name": "★ Talon Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1M5vahf6lsK_WBMXSA_vp3oORWWjuxlBMYuziEjJa3cX_DbwJyD5AlF7JetBjpwIfuZbi051Pfg4JMzSr9239Jvyw65OtRB71lpPPjCxLdOg"
+  },
+  {
+    "name": "★ Skeleton Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1I5PeibbBiLs-SH1iD1etzvN5iQSC1kCIvtjyTg8GgdnLEbwF0XJF4FuEP40HtwdLkNLy0s1GKg4pEzi-tjXgc7n1tsewET-N7rV-NMoFg"
+  },
+  {
+    "name": "★ Bayonet",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Wts2sab1iLvWHMWSF_uMvj-NoVhaggRIptiqEiYfGLC7DN0N9FMMhELFYtRLpx9W0MLjh4Q2L2d9AyHiv3HhKvCc44L0CAKJxrPfXjADfcepqy0ujMBs"
+  },
+  {
+    "name": "★ Flip Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1d4_u-V6VgH_ScHnecxPxJoOloXCzgqhEutDWR1N79dy2RbgUhCZZ4Q-ALukS4m9PlNbi25wLfjo5GnyT7jSNJ7Cc4suYcEf1yV0vEDxY"
+  },
+  {
+    "name": "★ Gut Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1c-uaRaalSJP-DHmuV09FmuOB6Sn2MmRQguynLzo74JX_EbgIlW5YjEeAKsRntkdbhNe_jtFTXgo0RxS-rj38cuHo95fFCD_S45FzBKg"
+  },
+  {
+    "name": "★ Huntsman Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1P7vG6YadsLM-bF1ifwut3vt5iQSC1kCJ-4wKIn4vwNCaJPVV2CJN2TbVbsRjpxoGzZezk5A2Ni4pAyi_6iHtN6nlj4edTBKF0-rqX0V-O5oiPkg"
+  },
+  {
+    "name": "★ Bowie Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1I-uC4YbJsLM-RAXCZxNFxo95rQD66kCIlvzyGkbD1ICbOMFdkX_0sHLBS9g7qx9HhMuyxtA3b3o0Tyij92H4fuy5q675XAPBxrvHVh1nBOeFo5ZYAOr_5Gl4TXifL"
+  },
+  {
+    "name": "★ Falchion Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1d7v6tYK1iLs-UHViWwOJ1uOhmQRaxmRwkuAKJm4LwLyrTO2l4X8M2DPlYsEK5w9PiM-vh51fdjdhMy3qqhyhPvXo-57sGBaAj8_eCiV6TZ-c-_9Bdc8r7VC2E"
+  },
+  {
+    "name": "★ Shadow Daggers",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1L-uGmV6VgH_ScHnecxPxJoOloXCziqhEutDWR1Nmgd3yUZwMgCZQmRuVfthW8x9WxNOi05g2Ij48UnC323SxPu3s5t-ocEf1yJR6gz8E"
+  },
+  {
+    "name": "★ Ursus Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1O_eG7e5tsMc-RAnKVxdF7teVgWiT9zUl1tWjTzt_9eSnFPQIlWZR4TO4MtkHskYazMurn5AKMjohDyC332DQJsHhNMA8umg"
+  },
+  {
+    "name": "★ Navaja Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1c9uK9cZtnIfOYBWmZx-tJse9WWyC0kA8YvC-ElIj8HifOOV5kFMMlRLJf4BK4k9LlZuy35QTYg95NzXmri3tB6yk4sO5XBaoh_PDRhgHfcepqTt5nFFY"
+  },
+  {
+    "name": "★ Stiletto Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1I-_uibbB5L8-AHliEwP5zj_R7TSi9qhUisiuc1N34dSiVOFd0XpN0RuACshnpl4LuYuvn5AaIjYkUmyz-3H9KvCxi5uccEf1yzYUK7Q4"
+  },
+  {
+    "name": "★ Nomad Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1U-uaqZ6t_H_iKMXCVw_1JveRtRjy-20pw5TvXydirInOUawdyWcRwEbRethCxwdDuZurk5wWKiIlFyyj5hixXrnE8nU2__vY"
+  },
+  {
+    "name": "★ Survival Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XuWbwcuyMESA4Fdl-4nnpU7iQA3-kKnr8ytd6s2taapkM77CDzbIlrsms-NsHHGxzUwj5G6En4yuIy_BbQAjC5VxQLRc5hm8x4HvKaq8sEukLuHu"
+  },
+  {
+    "name": "★ Paracord Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Y4OCqV6x0H_SXHmaE_uNztOh8Qmfilkl142jWmNv6JHmXbw9yDpFyF-AC5hC6k4ayMenq5gLXj4sUzyz7kGoXuVAGtbGy"
+  },
+  {
+    "name": "★ Classic Knife",
+    "url": "https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Y_OGRaalSOvWRHGavzedxuPUnGiy1xxkk6z_Tn4mucH2UOAUmCZZ1RLQJuhbrx9O0M-ji71OK34oTzDK-0H1Px6MwvA"
+  }
+];
+
+const RAW_CASES: Case[] = [
   {
     id: "crate-4001",
     name: "CS:GO Weapon Case",
@@ -6030,3 +6109,18 @@ export const CASES: Case[] = [
     items: crate7007Items,
   },
 ];
+
+export const CASES: Case[] = RAW_CASES.map(c => ({
+  ...c,
+  items: [
+    ...c.items.filter(i => i.rarity !== 'Rare Special Item'),
+    ...KNIVES.map((k, i) => ({
+      id: `knife-${c.id}-${i}`,
+      weapon: k.name,
+      name: "Vanilla",
+      rarity: "Rare Special Item" as Rarity,
+      image: k.url,
+      collection: c.name
+    }))
+  ]
+}));
