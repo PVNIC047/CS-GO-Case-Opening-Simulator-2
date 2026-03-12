@@ -6,12 +6,11 @@ import { calculateItemPrice } from '../utils/pricing';
 interface InventoryProps {
   items: InventoryItem[];
   onSellItem: (item: InventoryItem) => void;
-  onInspectItem: (item: InventoryItem) => void;
 }
 
 type SortOption = 'date-desc' | 'date-asc' | 'alpha-asc' | 'alpha-desc' | 'price-asc' | 'price-desc';
 
-export function Inventory({ items, onSellItem, onInspectItem }: InventoryProps) {
+export function Inventory({ items, onSellItem }: InventoryProps) {
   const [sortBy, setSortBy] = useState<SortOption>('date-desc');
 
   if (items.length === 0) {
@@ -71,12 +70,6 @@ export function Inventory({ items, onSellItem, onInspectItem }: InventoryProps) 
               inventoryItem={invItem} 
             />
             <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-md backdrop-blur-sm p-2 gap-2">
-              <button
-                onClick={() => onInspectItem(invItem)}
-                className="w-full bg-[#4b69ff] hover:bg-[#3b59df] text-white font-bold py-1.5 sm:py-2 px-3 sm:px-4 rounded transition-colors text-[10px] sm:text-xs uppercase tracking-wider"
-              >
-                Inspect
-              </button>
               <button
                 onClick={() => onSellItem(invItem)}
                 className="w-full bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/30 font-bold py-1.5 sm:py-2 px-3 sm:px-4 rounded transition-colors text-[10px] sm:text-xs uppercase tracking-wider"

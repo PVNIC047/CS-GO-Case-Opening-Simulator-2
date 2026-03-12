@@ -7,11 +7,12 @@ import { Roulette } from './components/Roulette';
 import { CaseUnlockAnimation } from './components/CaseUnlockAnimation';
 import { Inventory } from './components/Inventory';
 import { ItemCard } from './components/ItemCard';
-import { Wallet, Package, ArrowLeft, DollarSign, Settings as SettingsIcon } from 'lucide-react';
+import { Upgrades } from './components/Upgrades';
+import { Wallet, Package, ArrowLeft, DollarSign, Settings as SettingsIcon, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RARITY_COLORS } from './data/cases';
 
-type View = 'selector' | 'opening' | 'inventory' | 'settings';
+type View = 'selector' | 'opening' | 'inventory' | 'upgrades' | 'settings';
 
 interface AppSettings {
   instaOpen: boolean;
@@ -87,6 +88,10 @@ export default function App() {
     const saved = localStorage.getItem('cs2_sim_settings');
     return saved ? JSON.parse(saved) : { instaOpen: false, soundEnabled: true };
   });
+  const [upgrades, setUpgrades] = useState<{clickLevel: number, luckLevel: number}>(() => {
+    const saved = localStorage.getItem('cs2_sim_upgrades');
+    return saved ? JSON.parse(saved) : { clickLevel: 0, luckLevel: 0 };
+  });
   const [isMobile, setIsMobile] = useState(false);
 
   // Device detection and aspect ratio handling
@@ -108,7 +113,8 @@ export default function App() {
     localStorage.setItem('cs2_sim_cases', JSON.stringify(ownedCases));
     localStorage.setItem('cs2_sim_keys', JSON.stringify(ownedKeys));
     localStorage.setItem('cs2_sim_settings', JSON.stringify(settings));
-  }, [balance, inventory, ownedCases, ownedKeys, settings]);
+    localStorage.setItem('cs2_sim_upgrades', JSON.stringify(upgrades));
+  }, [balance, inventory, ownedCases, ownedKeys, settings, upgrades]);
 
   const handleBuyCase = (c: Case) => {
     if (balance < c.price) return;
@@ -130,7 +136,8 @@ export default function App() {
     
     setSelectedCase(c);
     
-    const winner = openCase(c.items);
+    const luckMultiplier = 1.0 + (upgrades.luckLevel * 0.05);
+    const winner = openCase(c.items, luckMultiplier);
     setWinningItem(winner);
     
     if (settings.instaOpen) {
@@ -167,7 +174,24 @@ export default function App() {
   };
 
   const addFunds = () => {
-    setBalance(prev => prev + 0.05);
+    const clickAmount = 0.05 + (upgrades.clickLevel * 0.05);
+    setBalance(prev => prev + clickAmount);
+  };
+
+  const handleUpgradeClick = () => {
+    const cost = 5.00 + (upgrades.clickLevel * 5.00);
+    if (balance >= cost) {
+      setBalance(prev => prev - cost);
+      setUpgrades(prev => ({ ...prev, clickLevel: prev.clickLevel + 1 }));
+    }
+  };
+
+  const handleUpgradeLuck = () => {
+    const cost = 50.00 + (upgrades.luckLevel * 50.00);
+    if (balance >= cost) {
+      setBalance(prev => prev - cost);
+      setUpgrades(prev => ({ ...prev, luckLevel: prev.luckLevel + 1 }));
+    }
   };
 
   const handleSellItem = (itemToSell: InventoryItem) => {
@@ -189,6 +213,7 @@ export default function App() {
     setInventory([]);
     setOwnedCases({});
     setOwnedKeys({});
+    setUpgrades({ clickLevel: 0, luckLevel: 0 });
     setView('selector');
     setSelectedCase(null);
     setWinningItem(null);
@@ -199,6 +224,7 @@ export default function App() {
     localStorage.removeItem('cs2_sim_inventory');
     localStorage.removeItem('cs2_sim_cases');
     localStorage.removeItem('cs2_sim_keys');
+    localStorage.removeItem('cs2_sim_upgrades');
   };
 
   const cancelReset = () => {
@@ -247,6 +273,17 @@ export default function App() {
                   Inventory ({inventory.length})
                 </button>
                 <button 
+                  onClick={() => setView('upgrades')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                    view === 'upgrades' 
+                      ? 'bg-[#2a2d36] text-white' 
+                      : 'text-gray-400 hover:text-white hover:bg-[#2a2d36]/50'
+                  }`}
+                >
+                  <Zap size={16} />
+                  Upgrades
+                </button>
+                <button 
                   onClick={() => setView('settings')}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                     view === 'settings' 
@@ -269,7 +306,7 @@ export default function App() {
                 <button 
                   onClick={addFunds}
                   className="bg-[#2a2d36] hover:bg-[#3a3d46] text-white p-2 rounded-md transition-colors border border-[#3a3d46] flex items-center justify-center"
-                  title="Add $0.05"
+                  title={`Add $${(0.05 + upgrades.clickLevel * 0.05).toFixed(2)}`}
                 >
                   <DollarSign size={14} />
                 </button>
@@ -305,6 +342,12 @@ export default function App() {
             </div>
           </button>
           <button 
+            onClick={() => setView('upgrades')}
+            className={`p-2 rounded-md transition-colors ${view === 'upgrades' ? 'text-[#4b69ff]' : 'text-gray-400'}`}
+          >
+            <Zap size={20} />
+          </button>
+          <button 
             onClick={() => setView('settings')}
             className={`p-2 rounded-md transition-colors ${view === 'settings' ? 'text-[#4b69ff]' : 'text-gray-400'}`}
           >
@@ -327,6 +370,16 @@ export default function App() {
           
           {view === 'inventory' && (
             <Inventory items={inventory} onSellItem={handleSellItem} />
+          )}
+
+          {view === 'upgrades' && (
+            <Upgrades 
+              balance={balance}
+              clickLevel={upgrades.clickLevel}
+              luckLevel={upgrades.luckLevel}
+              onUpgradeClick={handleUpgradeClick}
+              onUpgradeLuck={handleUpgradeLuck}
+            />
           )}
 
           {view === 'settings' && (

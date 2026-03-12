@@ -8,11 +8,24 @@ const ODDS = {
   'Rare Special Item': 0.0025575,
 };
 
-export function getRandomRarity(): Rarity {
+export function getRandomRarity(luckMultiplier: number = 1.0): Rarity {
   const rand = Math.random();
   let cumulative = 0;
   
-  for (const [rarity, chance] of Object.entries(ODDS)) {
+  // Calculate adjusted odds
+  const adjustedOdds = { ...ODDS };
+  
+  // Apply luck multiplier to rare items
+  adjustedOdds['Restricted'] *= luckMultiplier;
+  adjustedOdds['Classified'] *= luckMultiplier;
+  adjustedOdds['Covert'] *= luckMultiplier;
+  adjustedOdds['Rare Special Item'] *= luckMultiplier;
+  
+  // Recalculate Mil-Spec to ensure total is 1.0
+  const totalRareOdds = adjustedOdds['Restricted'] + adjustedOdds['Classified'] + adjustedOdds['Covert'] + adjustedOdds['Rare Special Item'];
+  adjustedOdds['Mil-Spec'] = Math.max(0, 1.0 - totalRareOdds);
+  
+  for (const [rarity, chance] of Object.entries(adjustedOdds)) {
     cumulative += chance;
     if (rand <= cumulative) {
       return rarity as Rarity;
@@ -34,8 +47,8 @@ export function getWearFromFloat(float: number): Wear {
   return 'Battle-Scarred';
 }
 
-export function openCase(items: Item[]): InventoryItem {
-  const rarity = getRandomRarity();
+export function openCase(items: Item[], luckMultiplier: number = 1.0): InventoryItem {
+  const rarity = getRandomRarity(luckMultiplier);
   
   // Filter items by selected rarity
   const possibleItems = items.filter(item => item.rarity === rarity);
